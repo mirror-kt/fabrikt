@@ -1,0 +1,4 @@
+jdk:
+  - openjdk17
+install:
+  - ./gradlew clean -Pgroup=com.github.mirror-kt -Pversion=feature~spring-http-interface-jitpack-31c923c0ef-1 -x test publishToMavenLocal

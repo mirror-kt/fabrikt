@@ -137,6 +137,10 @@ tasks {
         useJUnitPlatform()
         jvmArgs = listOf("--add-opens=java.base/java.lang=ALL-UNNAMED", "--add-opens=java.base/java.util=ALL-UNNAMED")
     }
+
+    withType<Sign> {
+        onlyIf { System.getenv("JITPACK") == null }
+    }
 }
 
 publishing {
