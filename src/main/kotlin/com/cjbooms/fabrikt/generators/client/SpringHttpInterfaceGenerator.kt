@@ -2,6 +2,7 @@ package com.cjbooms.fabrikt.generators.client
 
 import com.cjbooms.fabrikt.cli.ClientCodeGenOptionType
 import com.cjbooms.fabrikt.configurations.Packages
+import com.cjbooms.fabrikt.generators.GeneratorUtils.addAdditionalClientAnnotations
 import com.cjbooms.fabrikt.generators.GeneratorUtils.functionName
 import com.cjbooms.fabrikt.generators.GeneratorUtils.getPrimaryContentMediaType
 import com.cjbooms.fabrikt.generators.GeneratorUtils.toKdoc
@@ -55,7 +56,7 @@ class SpringHttpInterfaceGenerator(
             }
 
             val clientType = TypeSpec.interfaceBuilder(simpleClientName(resourceName))
-                .addAnnotation(generatedAnnotationSpec())
+                .addAdditionalClientAnnotations()
                 .addAnnotation(AnnotationSpec.builder(Suppress::class).addMember("%S", "unused").build())
                 .addFunctions(funcSpecs)
                 .build()
@@ -79,6 +80,7 @@ class SpringHttpInterfaceGenerator(
             .addModifiers(KModifier.ABSTRACT)
             .addKdoc(operation.toKdoc(parameters))
             .addHttpExchangeAnnotation(operation, resource, parameters, verb)
+            .addAdditionalClientAnnotations(operation)
             .addSuspendModifier(options)
             .addIncomingParameters(
                 parameters,
@@ -253,21 +255,5 @@ class SpringHttpInterfaceGenerator(
         }
     }
 
-    override fun generateLibrary(options: Set<ClientCodeGenOptionType>): Collection<GeneratedFile> = setOf(
-        generatedAnnotationFile()
-    )
-
-    private fun generatedAnnotationFile(): SimpleFile {
-        val destFile = srcPath.resolve(CodeGenerationUtils.packageToPath(packages.client))
-            .resolve("GeneratedClient.kt")
-        val annotationTypeSpec = TypeSpec.annotationBuilder(
-            ClassName(packages.client, "GeneratedClient")
-        ).build()
-        val fileSpec = FileSpec.builder(packages.client, "GeneratedClient").addType(annotationTypeSpec).build()
-        return SimpleFile(destFile, fileSpec.toString())
-    }
-
-    private fun generatedAnnotationSpec(): AnnotationSpec = AnnotationSpec.builder(
-        ClassName(packages.client, "GeneratedClient")
-    ).build()
+    override fun generateLibrary(options: Set<ClientCodeGenOptionType>): Collection<GeneratedFile> = setOf()
 }
